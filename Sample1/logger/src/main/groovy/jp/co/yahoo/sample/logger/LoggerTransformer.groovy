@@ -89,13 +89,19 @@ class LoggerTransformer extends Transform {
         ClassPool classPool = getClassPool(mergedInputs)
 
         // 対象となるクラスファイルを選定し、修正を加える
-        modify(classNames, classPool, outputDir)
+        modify(classNames, classPool)
+
+        // スコープ内のクラスをファイルに出力する
+        classNames.each {
+            def ctClass = classPool.getCtClass(it)
+            ctClass.writeFile(outputDir.canonicalPath)
+        }
     }
 
     /**
      * 実際に修正を加えるメソッド
      */
-    private static void modify(Set<String> classNames, ClassPool classPool, File outputDir) {
+    private static void modify(Set<String> classNames, ClassPool classPool) {
         classNames.collect{ classPool.getCtClass(it) }
                 .findAll{ it.hasAnnotation(Logging.class) }
                 .each {
@@ -111,13 +117,43 @@ class LoggerTransformer extends Transform {
                         && !Modifier.isInterface(it.getModifiers()) \
                         && !Modifier.isAbstract(it.getModifiers())
             }.each {
-                // メソッド冒頭に処理を追加
-                // クラスはフルパスで指定すること
-                it.insertBefore("android.util.Log.v(\"${tag}\", \"${it.getLongName()}\");")
-            }
+                // importは追加できないので、クラスはフルパスで指定すること
+                // メソッド開始のログ。メソッド名と引数の値を出力する
+                def startLog = new StringBuilder()
+                startLog.append("StringBuilder sb = new StringBuilder(\"(\");")
+                        .append("for(int i = 0; i < \$args.length; i++) {")
+                        .append("    if (\$args[i] != null) {")
+                        .append("        sb.append(\$args[i].toString())")
+                        .append("          .append(\",\");")
+                        .append("    }")
+                        .append("}")
+                        .append("sb.append(\")\");")
+                        .append("android.util.Log.v(\"$tag\", \"${it.getLongName()}\" + sb.toString());")
 
-            // 修正を加えたクラスをファイルに出力する
-            it.writeFile(outputDir.canonicalPath)
+                // メソッド冒頭に処理を追加
+                it.insertBefore(startLog.toString())
+
+                // メソッド終了のログ。戻り値を出力する
+                def resultLog = new StringBuilder()
+                def returnValue
+                if (it.getReturnType().getName() == "void") {
+                    // 戻り値がvoidの場合
+                    returnValue = "\"void\""
+                } else if (it.getReturnType().isPrimitive()) {
+                    // primitiveの場合
+                    returnValue = "\"returns \" + \$_"
+                } else {
+                    // Objectの場合
+                    resultLog.append("String resultValue = \"empty\";")
+                             .append("if (\$_ != null) resultValue = \$_.toString();")
+                    returnValue = "\"returns \" + resultValue"
+                }
+
+                resultLog.append("android.util.Log.v(\"$tag\", \"${it.getLongName()} \" + $returnValue);")
+
+                it.insertAfter(resultLog.toString())
+
+            }
         }
     }
 

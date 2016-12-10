@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'jp.co.yahoo.sample.logger'
 
 repositories {
     maven { url "file:${projectDir.getParentFile().parent}/archives" }
@@ -33,3 +32,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'jp.co.yahoo.sample.logger:logger:1.0-SNAPSHOT'
 }
+
+apply plugin: 'jp.co.yahoo.sample.logger'

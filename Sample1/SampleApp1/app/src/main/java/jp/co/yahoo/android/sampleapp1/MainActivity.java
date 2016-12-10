@@ -32,12 +32,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         numberText.setText(String.valueOf(number));
     }
 
-    private void increment() {
+    private int increment() {
         showNumber(++current);
+        return current;
     }
 
-    private void decrement() {
+    private int decrement() {
         showNumber(--current);
+        return current;
     }
 
 }
