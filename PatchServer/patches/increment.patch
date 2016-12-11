@@ -1,0 +1,5 @@
+function apply() {
+    instance.current +=2;
+    instance.showNumber(instance.current);
+    return -1;
+}
