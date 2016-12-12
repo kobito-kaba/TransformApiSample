@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
-//repositories {
-//    maven { url "file:${projectDir.getParentFile().parent}/archives" }
-//}
+repositories {
+    maven { url "file:${projectDir.getParentFile().parent}/archives" }
+}
 
 android {
     compileSdkVersion 25
@@ -30,8 +30,8 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-    //    compile 'jp.co.yahoo.sample.logger:logger:1.0-SNAPSHOT'
+    compile 'jp.co.yahoo.sample.patch:patcher:1.0-SNAPSHOT'
     compile project(':hotpatchandroidlib')
 }
 
-//apply plugin: 'jp.co.yahoo.sample.logger'
+apply plugin: 'jp.co.yahoo.sample.patch'

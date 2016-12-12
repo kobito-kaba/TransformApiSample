@@ -1,5 +1,5 @@
 function apply() {
-    instance.current +=2;
+    instance.current =30;
     instance.showNumber(instance.current);
     return -1;
 }

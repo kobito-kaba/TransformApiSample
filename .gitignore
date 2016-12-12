@@ -5,6 +5,7 @@ PatchServer/main
 bin/
 gen/
 out/
+mapping/
 *.class
 *.apk
 *.dex

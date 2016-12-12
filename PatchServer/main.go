@@ -8,13 +8,14 @@ import (
 	"strconv"
 	"github.com/gorilla/mux"
 	"encoding/json"
+	"net/url"
 )
 
 func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/patches/", FileListHandler).Methods("GET")
-	r.HandleFunc("/patches/{fileName:[A-Za-z0-9_]+.patch}", FileDownloadHandler).Methods("GET")
+	r.HandleFunc(`/patches/{fileName:.+.patch}`, FileDownloadHandler).Methods("GET")
 
 	http.ListenAndServe(":8080", r)
 }
@@ -37,7 +38,10 @@ func FileListHandler(w http.ResponseWriter, r *http.Request) {
 
 func FileDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	parameters := mux.Vars(r)
-	fileName := parameters["fileName"]
+	encoded := parameters["fileName"]
+
+	// ファイル名をデコードする
+	fileName, _ := url.QueryUnescape(encoded)
 
 	// パッチファイルの置かれるディレクトリ
 	dirPath, _ := getPatchDir()

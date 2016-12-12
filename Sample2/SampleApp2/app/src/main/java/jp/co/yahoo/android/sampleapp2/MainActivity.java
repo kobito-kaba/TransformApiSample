@@ -8,10 +8,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.mozilla.javascript.Undefined;
-
-import java.io.IOException;
-
 import jp.co.yahoo.android.hotpatchandroidlib.ScriptDownloader;
 import jp.co.yahoo.android.hotpatchandroidlib.ScriptRepository;
 import jp.co.yahoo.android.hotpatchandroidlib.ScriptRunner;
@@ -29,14 +25,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.incrementButton).setOnClickListener(this);
         findViewById(R.id.downloadButton).setOnClickListener(this);
         findViewById(R.id.removeButton).setOnClickListener(this);
-
-        try {
-            ScriptRunner.init();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        ScriptRepository.getInstance().loadScripts(this);
     }
 
     @Override
@@ -65,16 +53,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private int increment() {
-        if (ScriptRepository.getInstance().exists("increment")) {
-            Object result = new ScriptRunner().run("increment", int.class, this);
-            return (int)result;
-        } else {
-            showNumber(++current);
-            return current;
-        }
+        showNumber(++current);
+        return current;
     }
 
-    private int decrement() {
+    private Integer decrement() {
         showNumber(--current);
         return current;
     }

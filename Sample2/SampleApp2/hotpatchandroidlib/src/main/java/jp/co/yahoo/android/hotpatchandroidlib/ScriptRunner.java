@@ -14,19 +14,11 @@ import java.io.IOException;
 
 public class ScriptRunner {
 
-    private static final String RHINO_LOG = "var log = Packages.jp.co.yahoo.android.hotpatchandroidlib.ScriptRunner.log;";
-
     public static void init() throws IOException {
         ContextFactory.initGlobal(new UnsafeContextFactory());
     }
 
-    private static void log(String msg) {
-        Log.d("ScriptRunner", msg);
-    }
-
     public Object run(String signature, Class returnType, Object instance, Object ... args) {
-
-        log(signature + " started");
 
         String script = ScriptRepository.getInstance().findScript(signature);
 
@@ -45,11 +37,11 @@ public class ScriptRunner {
                 ScriptableObject.putProperty(scope, "arg" + i, Context.javaToJS(args[i], scope));
             }
 
-            rhino.evaluateString(scope, RHINO_LOG + script, "JavaScript", 1, null);
+            rhino.evaluateString(scope, script, "JavaScript", 1, null);
 
             Function function = (Function)scope.get("apply", scope);
 
-            Object result = (Object)function.call(rhino, scope, scope, functionParams);
+            Object result = function.call(rhino, scope, scope, functionParams);
 
             if (result instanceof Undefined) {
                 return result;
@@ -58,7 +50,6 @@ public class ScriptRunner {
             }
         } finally {
             Context.exit();
-            log(signature + " exit");
         }
     }
 
@@ -68,7 +59,8 @@ public class ScriptRunner {
     private static class UnsafeContextFactory extends ContextFactory {
         @Override
         protected boolean hasFeature(Context cx, int featureIndex) {
-            return featureIndex == 13 || super.hasFeature(cx, featureIndex);
+            return featureIndex == Context.FEATURE_ENHANCED_JAVA_ACCESS
+                    || super.hasFeature(cx, featureIndex);
         }
     }
 

@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
+import java.net.URLEncoder;
 
 public class ScriptDownloader {
     private static final String PORT = ":8080";
@@ -37,7 +37,8 @@ public class ScriptDownloader {
 
     private static String downloadFile(String fileName) {
         try {
-            return request(String.format(FILE_DOWNLOAD_URL, fileName));
+            String encoded = URLEncoder.encode(fileName, "UTF-8");
+            return request(String.format(FILE_DOWNLOAD_URL, encoded));
         } catch (IOException e) {
             e.printStackTrace();
         }
