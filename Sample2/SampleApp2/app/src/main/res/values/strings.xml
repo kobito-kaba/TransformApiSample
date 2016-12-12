@@ -2,6 +2,6 @@
     <string name="app_name">SampleApp2</string>
     <string name="increment">＋</string>
     <string name="decrement">ー</string>
-    <string name="download">download scripts</string>
-    <string name="remove">remove scripts</string>
+    <string name="download">download</string>
+    <string name="remove">reset</string>
 </resources>
